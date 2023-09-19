@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS  # Import CORS from flask_cors
 from script import scrape_coursesss
-
+from udemyScript import scrape_udemy_courses
 app = Flask(__name__)
 CORS(app)  # Enable CORS for your Flask app
 
@@ -22,6 +22,24 @@ def scrape_courses():
 
     except Exception as e:
         return jsonify({"message": str(e)}), 500
+
+@app.route("/scrape-udemy/", methods=["POST"])
+def scrape_udemy_cours():
+    data = request.get_json()
+    url = data.get("url", "")
+    page = data.get("page", 1)
+    print(url)
+    try:
+        output = scrape_udemy_courses(url, page) 
+
+        if output:
+            return jsonify({"message": "Scraping completed successfully", "output": output})
+        else:
+            return jsonify({"message": "Scraping failed"}), 500
+
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
