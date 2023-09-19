@@ -7,7 +7,7 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
 def scrape_udemy_courses(url, page):
-    SLEEP_TIME = 1
+    SLEEP_TIME = 3
     course_details = []
 
     # Initialize WebDriver
@@ -24,17 +24,23 @@ def scrape_udemy_courses(url, page):
 
         courses = [
             link.get_attribute("href")
-            for link in driver.find_elements(By.XPATH, "//h3[contains(@class, 'course-card-title-module')]/a")
+            for link in driver.find_elements(By.XPATH, "//h3[contains(@class, 'course-card-title-module--course-title')]/a")
         ]
-
+        print(courses)
         # Get details of each course
         for course_url in courses:
             course = {}
             driver.get(course_url)
             time.sleep(SLEEP_TIME)
             title = driver.find_element(By.XPATH, "//h1[contains(@class, 'title')]").text
+            price = driver.find_element(By.XPATH, "//div[contains(@class, 'price-text')]/span[2]").text
+            print(price)
             course["title"] = title
+            course["price"] = price
+
             course["url"] = course_url
+            # course["price"] = price
+
             try:
                 description = driver.find_element(By.XPATH, "//div[contains(@class, 'lead__headline')]").text
                 course["description"] = description
